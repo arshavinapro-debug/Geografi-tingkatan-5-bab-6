@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geografi T5 Bab 6: Misi Batuan Superhero</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        comic: ['Bangers', 'cursive'],
+                        sans: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        spidey: { red: '#E62429', blue: '#0055FF', dark: '#111827' },
+                        cap: { blue: '#002B7F', red: '#D52B1E', silver: '#E5E7EB' },
+                        thor: { gold: '#FBBF24', silver: '#9CA3AF', dark: '#1F2937' },
+                        hulk: { green: '#16a34a', dark: '#14532d' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .comic-border {
+            border: 4px solid #111827;
+            box-shadow: 6px 6px 0px #111827;
+        }
+        .comic-btn {
+            transition: all 0.1s ease;
+        }
+        .comic-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #111827;
+        }
+        .comic-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #111827;
+        }
+        .bg-comic-pattern {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 20px 20px;
+        }
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.6)); }
+            50% { filter: drop-shadow(0 0 20px rgba(250, 204, 21, 1)); }
+        }
+        .hero-glow {
+            animation: pulse-glow 2.5s infinite ease-in-out;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableCertificate, #printableCertificate * {
+                visibility: visible;
+            }
+            #printableCertificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-comic-pattern font-sans text-gray-900 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-gradient-to-r from-red-600 via-blue-600 to-yellow-500 text-white border-b-4 border-black p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <span class="text-4xl animate-bounce-subtle">🕷️</span>
+                <div>
+                    <h1 class="font-comic text-2xl md:text-3xl tracking-wide text-yellow-300 drop-shadow-[0_2px_2px_rgba(0,0,0,1)]">
+                        MISI BATUAN SUPERHERO
+                    </h1>
+                    <p class="text-xs font-semibold text-white tracking-wider">GEOGRAFI TINGKATAN 5 (KSSM BAB 6)</p>
+                </div>
+            </div>
+
+            <!-- Audio & Reset Controls -->
+            <div class="flex items-center space-x-3">
+                <button id="soundToggleBtn" onclick="toggleSound()" class="bg-yellow-400 hover:bg-yellow-300 text-black px-3 py-1.5 rounded-xl font-bold border-2 border-black text-sm flex items-center gap-1 shadow">
+                    <i id="soundIcon" class="fas fa-volume-up"></i> <span id="soundTxt">Bunyi: ON</span>
+                </button>
+                <div class="bg-black/40 px-3 py-1.5 rounded-xl border-2 border-white/50 text-yellow-300 font-comic text-lg">
+                    ⭐ <span id="navScore">0</span> PTS
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto p-4 flex-grow w-full">
+
+        <!-- TAB NAVIGATION -->
+        <div class="flex flex-wrap justify-center gap-2 mb-6">
+            <button onclick="switchTab('noteTab')" id="btn-noteTab" class="tab-btn comic-btn bg-yellow-400 text-black font-comic text-lg px-4 py-2 rounded-xl border-3 border-black font-bold flex items-center gap-2">
+                <span>⚡</span> NOTA SUPERHERO
+            </button>
+            <button onclick="switchTab('matchTab')" id="btn-matchTab" class="tab-btn comic-btn bg-white text-black font-comic text-lg px-4 py-2 rounded-xl border-3 border-black font-bold flex items-center gap-2">
+                <span>🛡️</span> PADANAN BATUAN
+            </button>
+            <button onclick="switchTab('quizTab')" id="btn-quizTab" class="tab-btn comic-btn bg-white text-black font-comic text-lg px-4 py-2 rounded-xl border-3 border-black font-bold flex items-center gap-2">
+                <span>🕷️</span> CABARAN KUIZ (10 SOALAN)
+            </button>
+            <button onclick="switchTab('certTab')" id="btn-certTab" class="tab-btn comic-btn bg-white text-black font-comic text-lg px-4 py-2 rounded-xl border-3 border-black font-bold flex items-center gap-2">
+                <span>📜</span> SIJIL SUPERHERO
+            </button>
+        </div>
+
+        <!-- ================= TAB 1: NOTA INTERAKTIF SUPERHERO ================= -->
+        <section id="noteTab" class="tab-content block">
+            <!-- Hero Mascot Welcome -->
+            <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white p-6 rounded-2xl comic-border mb-8 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center gap-6 z-10 relative">
+                    <div class="text-6xl md:text-7xl hero-glow">🕷️⚡🛡️🟢🦾</div>
+                    <div>
+                        <h2 class="font-comic text-3xl text-yellow-300 mb-2">SELAMAT DATANG, WIRA GEOGRAFI!</h2>
+                        <p class="text-base text-gray-200 leading-relaxed">
+                            Bumi kita kaya dengan pelbagai jenis batuan. Terokai 3 jenis batuan utama: <strong>Batuan Igneus</strong> (terbahagi kepada <em>Rejahan</em> & <em>Terobosan</em>), <strong>Batuan Sedimen</strong>, dan <strong>Batuan Metamorfosis</strong>!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Focus Alert Box for Igneus Rejahan & Terobosan -->
+            <div class="bg-yellow-100 border-4 border-black p-5 rounded-2xl mb-8 comic-border">
+                <h3 class="font-comic text-2xl text-red-600 flex items-center gap-2 mb-2">
+                    <span>⚡</span> THOR DISCOVERY: PEMBAHAGIAN BATUAN IGNEUS
+                </h3>
+                <p class="text-sm text-gray-800 leading-relaxed">
+                    Batuan Igneus terhasil daripada pembekuan magma dan lava. Pembekuan ini berlaku di dua lokasi berbeza yang membentuk <strong>2 Jenis Igneus</strong>:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm">
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-500 shadow">
+                        <span class="bg-red-600 text-white font-comic text-xs px-2 py-1 rounded">1. REJAHAN (INTRUSIVE)</span>
+                        <h4 class="font-bold text-lg text-red-700 mt-2">🌋 Di Dalam Kerak Bumi</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs mt-1 text-gray-700">
+                            <li>Magma sejuk <strong>PERLAHAN</strong> di dalam bumi.</li>
+                            <li>Mempunyai <strong>KRISTAL SAIZ BESAR</strong> & tekstur kasar.</li>
+                            <li><strong>Contoh:</strong> Granit, Gabro, Diorit.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border-2 border-yellow-500 shadow">
+                        <span class="bg-yellow-500 text-black font-comic text-xs px-2 py-1 rounded">2. TEROBOSAN (EXTRUSIVE)</span>
+                        <h4 class="font-bold text-lg text-yellow-700 mt-2">🌋 Di Luar Permukaan Bumi</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs mt-1 text-gray-700">
+                            <li>Lava sejuk <strong>PANTAS</strong> di luar semasa letusan.</li>
+                            <li>Mempunyai <strong>KRISTAL SAIZ HALUS</strong> / berliang.</li>
+                            <li><strong>Contoh:</strong> Basalt, Pumis, Obsidian, Riolit.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Main Rock Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Igneus Card -->
+                <div class="bg-red-50 rounded-2xl p-5 comic-border border-red-600 flex flex-col justify-between hover:scale-[1.01] transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-4xl">⚡</span>
+                            <span class="bg-red-600 text-white font-comic px-3 py-1 rounded-full text-xs">THOR POWER</span>
+                        </div>
+                        <h3 class="font-comic text-2xl text-red-600 mb-1">1. BATUAN IGNEUS</h3>
+                        <p class="text-xs font-bold text-gray-500 mb-3">🔥 Penjepulan & Pembekuan Magma/Lava</p>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white p-3 rounded-lg border border-red-200">
+                                <strong class="text-red-700 text-xs">🔥 Igneus Rejahan:</strong>
+                                <p class="text-xs text-gray-700">Pembekuan magma perlahan di dalam bumi. Kristal kasar.</p>
+                                <span class="inline-block mt-1 bg-red-100 text-red-800 text-[11px] px-2 py-0.5 rounded font-bold">Granit, Gabro, Diorit</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-red-200">
+                                <strong class="text-yellow-700 text-xs">💥 Igneus Terobosan:</strong>
+                                <p class="text-xs text-gray-700">Pembekuan lava pantas di permukaan bumi. Kristal halus/kaca.</p>
+                                <span class="inline-block mt-1 bg-yellow-100 text-yellow-800 text-[11px] px-2 py-0.5 rounded font-bold">Basalt, Pumis, Obsidian</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-red-200 text-xs font-bold text-red-700">
+                        🔨 Kegunaan: Jalan raya, pemecah ombak, landasan kereta api.
+                    </div>
+                </div>
+
+                <!-- Sedimen Card -->
+                <div class="bg-blue-50 rounded-2xl p-5 comic-border border-blue-600 flex flex-col justify-between hover:scale-[1.01] transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-4xl">🛡️</span>
+                            <span class="bg-blue-600 text-white font-comic px-3 py-1 rounded-full text-xs">CAPTAIN AMERICA</span>
+                        </div>
+                        <h3 class="font-comic text-2xl text-blue-700 mb-1">2. BATUAN SEDIMEN</h3>
+                        <p class="text-xs font-bold text-gray-500 mb-3">🧱 Mampatan & Penyemenan Mendapan</p>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white p-3 rounded-lg border border-blue-200">
+                                <strong class="text-blue-700 text-xs">🌊 Proses Pembentukan:</strong>
+                                <p class="text-xs text-gray-700">Hakisan dan pemendapan serpihan batuan, fosil tumbuhan/haiwan yang dimampatkan bertapis-tapis.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-blue-200">
+                                <strong class="text-blue-700 text-xs">💎 Contoh Batuan Utama:</strong>
+                                <ul class="list-disc list-inside text-xs mt-1 space-y-1 text-gray-700">
+                                    <li><strong>Batu Kapur:</strong> Fosil cangkang laut.</li>
+                                    <li><strong>Batu Pasir:</strong> Mendapan pasir.</li>
+                                    <li><strong>Syal:</strong> Mendapan tanah liat.</li>
+                                    <li><strong>Batu Arang:</strong> Fosil tumbuhan.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-blue-200 text-xs font-bold text-blue-700">
+                        🏗️ Kegunaan: Simen, genting, batu bata, baja fosfat, bahan api.
+                    </div>
+                </div>
+
+                <!-- Metamorfosis Card -->
+                <div class="bg-green-50 rounded-2xl p-5 comic-border border-green-600 flex flex-col justify-between hover:scale-[1.01] transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-4xl">🟢</span>
+                            <span class="bg-green-600 text-white font-comic px-3 py-1 rounded-full text-xs">HULK TRANSFORM</span>
+                        </div>
+                        <h3 class="font-comic text-2xl text-green-700 mb-1">3. BATUAN METAMORFOSIS</h3>
+                        <p class="text-xs font-bold text-gray-500 mb-3">🌀 Perubahan Akibat Haba & Tekanan Tinggi</p>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white p-3 rounded-lg border border-green-200">
+                                <strong class="text-green-700 text-xs">♨️ Proses Transformasi:</strong>
+                                <p class="text-xs text-gray-700">Batuan asal (Igneus/Sedimen) bertukar bentuk apabila mengalami suhu amat tinggi & tekanan kuat.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-green-200">
+                                <strong class="text-green-700 text-xs">💎 Perubahan Batuan Asal:</strong>
+                                <ul class="list-disc list-inside text-xs mt-1 space-y-1 text-gray-700">
+                                    <li>Batu Kapur ➡️ <strong>Guli</strong></li>
+                                    <li>Granit ➡️ <strong>Gneis</strong></li>
+                                    <li>Batu Pasir ➡️ <strong>Kuartzit</strong></li>
+                                    <li>Syal ➡️ <strong>Slat / Syis</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-green-200 text-xs font-bold text-green-700">
+                        ✨ Kegunaan: Kemasan lantai mewah, ukiran seni, alat pemotong kaca.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Summary Table Kepentingan Batuan -->
+            <div class="bg-white p-6 rounded-2xl comic-border">
+                <h3 class="font-comic text-2xl text-gray-800 mb-4 flex items-center gap-2">
+                    <span>🏆</span> RUMUSAN KEPENTINGAN BATUAN DALAM PEMBANGUNAN
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-yellow-400 border-2 border-black text-black font-comic text-lg">
+                                <th class="p-3 border border-black">Sektor</th>
+                                <th class="p-3 border border-black">Jenis Batuan</th>
+                                <th class="p-3 border border-black">Kegunaan Utamanya</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-300 hover:bg-gray-50">
+                                <td class="p-3 font-bold border border-gray-300">🏗️ Pembinaan & Infrastruktur</td>
+                                <td class="p-3 border border-gray-300">Granit (Igneus Rejahan), Batu Kapur (Sedimen)</td>
+                                <td class="p-3 border border-gray-300">Jalan raya, jambatan, asas bangunan, simen & konkrit.</td>
+                            </tr>
+                            <tr class="border-b border-gray-300 hover:bg-gray-50">
+                                <td class="p-3 font-bold border border-gray-300">💍 Perhiasan & Ukiran</td>
+                                <td class="p-3 border border-gray-300">Guli (Metamorfosis), Intan / Berlian</td>
+                                <td class="p-3 border border-gray-300">Kemasan lantai rumah mewah, patung seni, mata pemotong kaca.</td>
+                            </tr>
+                            <tr class="border-b border-gray-300 hover:bg-gray-50">
+                                <td class="p-3 font-bold border border-gray-300">🌾 Pertanian & Industri</td>
+                                <td class="p-3 border border-gray-300">Batu Fosfat, Garam Batu (Sedimen)</td>
+                                <td class="p-3 border border-gray-300">Baja untuk kesuburan tanah, pengawetan makanan dan industri kimia.</td>
+                            </tr>
+                            <tr class="border-b border-gray-300 hover:bg-gray-50">
+                                <td class="p-3 font-bold border border-gray-300">🏺 Kraf Tangan & Tembikar</td>
+                                <td class="p-3 border border-gray-300">Syal / Tanah Liat (Sedimen)</td>
+                                <td class="p-3 border border-gray-300">Pembuatan batu bata, tembikar seni, dan genting bumbung.</td>
+                            </tr>
+                            <tr class="border-b border-gray-300 hover:bg-gray-50">
+                                <td class="p-3 font-bold border border-gray-300">⚡ Sumber Tenaga</td>
+                                <td class="p-3 border border-gray-300">Batu Arang (Sedimen Organik)</td>
+                                <td class="p-3 border border-gray-300">Bahan api penjanaan kuasa elektrik di stesen kuasa.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 2: GAME PADANKAN BATUAN ================= -->
+        <section id="matchTab" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-2xl comic-border mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b-2 border-gray-200">
+                    <div>
+                        <h2 class="font-comic text-3xl text-blue-800 flex items-center gap-2">
+                            <span>🛡️</span> MISI PADANAN KATEGORI & REJAHAN/TEROBOSAN
+                        </h2>
+                        <p class="text-sm text-gray-600">Pilih 1 Batuan di sebelah kiri, kemudian padankan dengan jenis/sub-jenis yang tepat di sebelah kanan!</p>
+                    </div>
+                    <button onclick="resetMatchGame()" class="comic-btn bg-red-500 text-white font-comic px-4 py-2 rounded-xl border-2 border-black text-sm">
+                        🔄 Semula Game
+                    </button>
+                </div>
+
+                <!-- Game Container -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Column: Rock Cards -->
+                    <div>
+                        <h3 class="font-comic text-xl text-red-600 mb-3 flex items-center gap-1">
+                            <span>🪨</span> PILIH BATUAN:
+                        </h3>
+                        <div id="rockList" class="space-y-3">
+                            <!-- JS Inject Rock Buttons -->
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Target Categories -->
+                    <div>
+                        <h3 class="font-comic text-xl text-blue-600 mb-3 flex items-center gap-1">
+                            <span>🎯</span> PILIH KATEGORI / KEGUNAN:
+                        </h3>
+                        <div id="targetList" class="space-y-3">
+                            <!-- JS Inject Target Buttons -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Feedback Alert -->
+                <div id="matchFeedback" class="mt-6 p-4 rounded-xl border-2 border-black font-bold text-center hidden"></div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 3: CABARAN KUIZ (MCQ) ================= -->
+        <section id="quizTab" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-2xl comic-border relative">
+                
+                <!-- Quiz Header & Progress -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-comic text-xl text-red-600 flex items-center gap-2">
+                            <span>🕷️</span> SOALAN <span id="currentQNum">1</span> DEPARADA 10
+                        </span>
+                        <span class="font-bold text-sm bg-yellow-300 border-2 border-black px-3 py-1 rounded-full">
+                            Skor Kuiz: <span id="quizScoreText">0</span>
+                        </span>
+                    </div>
+
+                    <!-- Superhero Progress Bar -->
+                    <div class="w-full bg-gray-200 h-5 rounded-full border-2 border-black overflow-hidden relative">
+                        <div id="progressBar" class="bg-gradient-to-r from-red-500 via-yellow-400 to-green-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Question Box -->
+                <div id="questionContainer" class="bg-blue-50 p-5 rounded-2xl border-2 border-blue-400 mb-6">
+                    <h3 id="questionText" class="font-semibold text-lg md:text-xl text-gray-800 leading-snug">
+                        <!-- JS injected question -->
+                    </h3>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- JS injected options -->
+                </div>
+
+                <!-- Explanation / Feedback Box -->
+                <div id="quizFeedback" class="p-4 rounded-xl border-2 border-black hidden mb-6">
+                    <!-- JS injected explanation -->
+                </div>
+
+                <!-- Next Button -->
+                <div class="flex justify-end">
+                    <button id="nextQBtn" onclick="nextQuestion()" class="comic-btn bg-yellow-400 hover:bg-yellow-300 text-black font-comic text-xl px-6 py-2.5 rounded-xl border-3 border-black font-bold hidden">
+                        SOALAN SETERUSNYA ➡️
+                    </button>
+                </div>
+
+                <!-- Final Result Screen (Hidden by Default) -->
+                <div id="quizResultScreen" class="hidden text-center py-8">
+                    <div class="text-7xl mb-4 animate-bounce">🏆⚡🕷️🟢</div>
+                    <h2 class="font-comic text-4xl text-yellow-500 drop-shadow-[0_2px_2px_rgba(0,0,0,1)] mb-2">TAHNIAH, HERO GEOGRAFI!</h2>
+                    <p class="text-lg font-semibold text-gray-700 mb-4">Anda telah menyempurnakan Cabaran Kuiz Batuan Bab 6!</p>
+                    
+                    <div class="bg-gradient-to-r from-red-100 to-blue-100 p-6 rounded-2xl comic-border max-w-md mx-auto mb-6">
+                        <p class="text-sm text-gray-600 font-bold uppercase tracking-wider mb-1">Skor Akhir Kuiz Anda</p>
+                        <p class="font-comic text-6xl text-blue-700" id="finalQuizScore">0 / 100</p>
+                        <p id="resultBadge" class="mt-3 inline-block bg-yellow-400 border-2 border-black font-comic px-4 py-1.5 rounded-full text-base font-bold">
+                            <!-- Badge text -->
+                        </p>
+                    </div>
+
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <button onclick="restartQuiz()" class="comic-btn bg-red-600 text-white font-comic text-xl px-6 py-3 rounded-xl border-3 border-black">
+                            🔄 Cuba Kuiz Sekali Lagi
+                        </button>
+                        <button onclick="goToCert()" class="comic-btn bg-green-500 text-white font-comic text-xl px-6 py-3 rounded-xl border-3 border-black">
+                            📜 Cetak Sijil Kelayakan
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 4: SIJIL SUPERHERO ================= -->
+        <section id="certTab" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-2xl comic-border">
+                <h2 class="font-comic text-3xl text-yellow-500 text-center mb-2 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]">
+                    📜 SIJIL PENCAPAIAN SUPERHERO GEOGRAFI
+                </h2>
+                <p class="text-center text-sm text-gray-600 mb-6">Masukkan nama anda untuk menjana Sijil Kelayakan Batuan Bab 6 KSSM!</p>
+
+                <!-- Input Name Form -->
+                <div class="max-w-md mx-auto mb-8 flex gap-2">
+                    <input type="text" id="studentNameInput" placeholder="Masukkan Nama Penuh Anda..." class="flex-grow p-3 rounded-xl border-2 border-black font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <button onclick="generateCertificate()" class="comic-btn bg-yellow-400 text-black font-comic text-lg px-5 py-2 rounded-xl border-2 border-black font-bold">
+                        JANA SIJIL
+                    </button>
+                </div>
+
+                <!-- Certificate Printable Container -->
+                <div id="printableCertificate" class="bg-gradient-to-br from-yellow-50 via-white to-blue-50 p-8 rounded-2xl border-8 border-yellow-500 relative max-w-3xl mx-auto shadow-2xl">
+                    <div class="border-4 border-black p-6 rounded-xl relative text-center">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-4xl">🕷️</span>
+                            <span class="font-comic text-red-600 text-2xl tracking-widest">KSSM GEOGRAFI TINGKATAN 5</span>
+                            <span class="text-4xl">⚡</span>
+                        </div>
+
+                        <h1 class="font-comic text-4xl text-blue-900 mb-1">SIJIL KELAYAKAN BATUAN</h1>
+                        <p class="text-xs uppercase tracking-widest text-gray-500 font-bold mb-6">Dengan Ini Memperakukan Bahawa</p>
+
+                        <h2 id="certNameDisplay" class="font-comic text-4xl text-red-600 border-b-2 border-black inline-block px-8 pb-1 mb-6">
+                            [ NAMA PELAJAR ]
+                        </h2>
+
+                        <p class="text-sm text-gray-700 leading-relaxed max-w-lg mx-auto mb-6">
+                            Telah berjaya menguasai topik <strong>Bab 6: Pembentukan dan Kepentingan Batuan</strong> termasuk pembezaan <em>Batuan Igneus Rejahan & Terobosan</em>, Batuan Sedimen, dan Batuan Metamorfosis.
+                        </p>
+
+                        <div class="flex justify-around items-center pt-4 border-t-2 border-dashed border-gray-400 text-xs font-bold text-gray-600">
+                            <div>
+                                <p class="text-yellow-600 font-comic text-lg" id="certScoreDisplay">MATA: 0 PTS</p>
+                                <p>Skor Terkumpul</p>
+                            </div>
+                            <div class="text-3xl">🛡️🟢🦾</div>
+                            <div>
+                                <p class="font-comic text-base text-gray-800">LULUS DENGAN CEMERLANG</p>
+                                <p>Modul Interaktif KSSM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button onclick="window.print()" class="comic-btn bg-blue-600 text-white font-comic text-xl px-6 py-2.5 rounded-xl border-3 border-black">
+                        🖨️ Cetak / Simpan Sijil (PDF)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-400 text-center py-4 text-xs border-t-4 border-black mt-8">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+            <p> Modul Interaktif Geografi Tingkatan 5 KSSM - Bab 6: Pembentukan & Kepentingan Batuan</p>
+            <p class="font-comic text-yellow-400 text-sm">Disokong oleh Spiderman 🕷️, Captain America 🛡️, Thor ⚡, Hulk 🟢 & Iron Man 🦾</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Sound System (Web Audio API Synthesizer)
+        let soundEnabled = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'win') {
+                    const now = audioCtx.currentTime;
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const noteOsc = audioCtx.createOscillator();
+                        const noteGain = audioCtx.createGain();
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(audioCtx.destination);
+                        noteOsc.frequency.value = freq;
+                        noteGain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                        noteGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                        noteOsc.start(now + idx * 0.1);
+                        noteOsc.stop(now + idx * 0.1 + 0.25);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio playing not permitted yet.");
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const txt = document.getElementById('soundTxt');
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up';
+                txt.innerText = 'Bunyi: ON';
+                playSound('click');
+            } else {
+                icon.className = 'fas fa-volume-mute';
+                txt.innerText = 'Bunyi: OFF';
+            }
+        }
+
+        // Global Score Manager
+        let globalScore = 0;
+        function addScore(pts) {
+            globalScore += pts;
+            document.getElementById('navScore').innerText = globalScore;
+            document.getElementById('certScoreDisplay').innerText = `MATA: ${globalScore} PTS`;
+        }
+
+        // Navigation Tabs logic
+        function switchTab(tabId) {
+            playSound('click');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-yellow-400');
+                btn.classList.add('bg-white');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.remove('bg-white');
+            document.getElementById('btn-' + tabId).classList.add('bg-yellow-400');
+        }
+
+        /* ==========================================================================
+           MATCHING GAME DATA & LOGIC (Updated for Rejahan vs Terobosan)
+           ========================================================================== */
+        const matchData = [
+            { id: 1, name: "🌋 Granit", type: "Igneus Rejahan", desc: "Magma sejuk perlahan di dalam bumi (Kristal kasar)", matched: false },
+            { id: 2, name: "💥 Basalt", type: "Igneus Terobosan", desc: "Lava sejuk pantas di permukaan laut (Kristal halus)", matched: false },
+            { id: 3, name: "🧽 Pumis", type: "Igneus Terobosan", desc: "Lava berliang perangkap gas, berkeupayaan terapung", matched: false },
+            { id: 4, name: "🧱 Batu Kapur", type: "Batuan Sedimen", desc: "Bahan asas pembuatan simen & konkrit", matched: false },
+            { id: 5, name: "✨ Guli (Marble)", type: "Batuan Metamorfosis", desc: "Penjelmaan Batu Kapur akibat haba/tekanan tinggi", matched: false },
+            { id: 6, name: "🏺 Syal / Tanah Liat", type: "Batuan Sedimen", desc: "Bahan asas tembikar, genting & batu bata", matched: false }
+        ];
+
+        let selectedRock = null;
+        let selectedTarget = null;
+
+        function initMatchGame() {
+            const rockListEl = document.getElementById('rockList');
+            const targetListEl = document.getElementById('targetList');
+
+            rockListEl.innerHTML = '';
+            targetListEl.innerHTML = '';
+            document.getElementById('matchFeedback').classList.add('hidden');
+
+            const shuffledRocks = [...matchData].sort(() => Math.random() - 0.5);
+            const shuffledTargets = [...matchData].sort(() => Math.random() - 0.5);
+
+            shuffledRocks.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `rock-btn-${item.id}`;
+                btn.className = `w-full text-left p-3.5 rounded-xl border-2 border-black font-bold comic-btn bg-yellow-100 hover:bg-yellow-200 transition flex justify-between items-center`;
+                btn.innerHTML = `<span>${item.name}</span> <i class="fas fa-arrow-right text-gray-400"></i>`;
+                btn.onclick = () => selectRock(item);
+                rockListEl.appendChild(btn);
+            });
+
+            shuffledTargets.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `target-btn-${item.id}`;
+                btn.className = `w-full text-left p-3.5 rounded-xl border-2 border-black font-semibold comic-btn bg-blue-50 hover:bg-blue-100 transition text-sm`;
+                btn.innerHTML = `<span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-md mr-1">${item.type}</span> ${item.desc}`;
+                btn.onclick = () => selectTarget(item);
+                targetListEl.appendChild(btn);
+            });
+        }
+
+        function selectRock(item) {
+            if (item.matched) return;
+            playSound('click');
+            selectedRock = item;
+
+            matchData.forEach(r => {
+                const el = document.getElementById(`rock-btn-${r.id}`);
+                if (el && !r.matched) el.classList.remove('ring-4', 'ring-red-500', 'bg-red-200');
+            });
+            const curEl = document.getElementById(`rock-btn-${item.id}`);
+            curEl.classList.add('ring-4', 'ring-red-500', 'bg-red-200');
+
+            checkMatch();
+        }
+
+        function selectTarget(item) {
+            if (item.matched) return;
+            playSound('click');
+            selectedTarget = item;
+
+            matchData.forEach(t => {
+                const el = document.getElementById(`target-btn-${t.id}`);
+                if (el && !t.matched) el.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-200');
+            });
+            const curEl = document.getElementById(`target-btn-${item.id}`);
+            curEl.classList.add('ring-4', 'ring-blue-500', 'bg-blue-200');
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (!selectedRock || !selectedTarget) return;
+
+            const feedbackEl = document.getElementById('matchFeedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (selectedRock.id === selectedTarget.id) {
+                playSound('correct');
+                selectedRock.matched = true;
+                selectedTarget.matched = true;
+                addScore(20);
+
+                feedbackEl.className = "mt-6 p-4 rounded-xl border-2 border-green-700 bg-green-100 text-green-900 font-bold text-center";
+                feedbackEl.innerHTML = `🕷️ Spiderman kata: TEPAT! <strong>${selectedRock.name}</strong> tergolong sebagai <strong>${selectedRock.type}</strong> (${selectedRock.desc}). [+20 Mata]`;
+
+                const rBtn = document.getElementById(`rock-btn-${selectedRock.id}`);
+                const tBtn = document.getElementById(`target-btn-${selectedTarget.id}`);
+
+                rBtn.className = "w-full text-left p-3.5 rounded-xl border-2 border-green-600 bg-green-200 text-green-900 font-bold opacity-75 cursor-not-allowed flex justify-between items-center";
+                tBtn.className = "w-full text-left p-3.5 rounded-xl border-2 border-green-600 bg-green-200 text-green-900 font-bold opacity-75 cursor-not-allowed text-sm";
+                rBtn.innerHTML = `<span>${selectedRock.name}</span> <i class="fas fa-check-circle text-green-600"></i>`;
+
+                selectedRock = null;
+                selectedTarget = null;
+
+                if (matchData.every(m => m.matched)) {
+                    playSound('win');
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                    feedbackEl.innerHTML = `🏆 THUNDER & SPIDEY POWER! Anda berjaya memadankan KESEMUA batuan! Bonus +50 Mata!`;
+                    addScore(50);
+                }
+
+            } else {
+                playSound('wrong');
+                feedbackEl.className = "mt-6 p-4 rounded-xl border-2 border-red-700 bg-red-100 text-red-900 font-bold text-center";
+                feedbackEl.innerHTML = `🛡️ Captain America kata: Kurang Tepat! <strong>${selectedRock.name}</strong> tidak sepadan dengan penerangan itu. Cuba lagi!`;
+
+                setTimeout(() => {
+                    if (selectedRock && !selectedRock.matched) {
+                        const rEl = document.getElementById(`rock-btn-${selectedRock.id}`);
+                        if (rEl) rEl.classList.remove('ring-4', 'ring-red-500', 'bg-red-200');
+                    }
+                    if (selectedTarget && !selectedTarget.matched) {
+                        const tEl = document.getElementById(`target-btn-${selectedTarget.id}`);
+                        if (tEl) tEl.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-200');
+                    }
+                    selectedRock = null;
+                    selectedTarget = null;
+                }, 1000);
+            }
+        }
+
+        function resetMatchGame() {
+            playSound('click');
+            matchData.forEach(m => m.matched = false);
+            selectedRock = null;
+            selectedTarget = null;
+            initMatchGame();
+        }
+
+
+        /* ==========================================================================
+           QUIZ MCQ DATA (10 KSSM Questions)
+           ========================================================================== */
+        const quizQuestions = [
+            {
+                q: "1. Batuan Igneus terbahagi kepada dua jenis utama iaitu Batuan Igneus Rejahan dan Terobosan. Apakah faktor utama pembezaan kedua-duanya?",
+                options: ["Warna dan tahap keasidan batuan", "Lokasi penyejukan dan kadar pembekuan magma/lava", "Ketebalan lapisan fosil di dalamnya", "Jumlah kandungan air laut"],
+                answer: 1,
+                hero: "⚡ Thor",
+                explain: "Igneus Rejahan membeku di dalam bumi secara perlahan (kristal kasar), manakala Igneus Terobosan membeku di permukaan bumi secara pantas (kristal halus)."
+            },
+            {
+                q: "2. Batuan Igneus REJAHAN terbentuk daripada pembekuan magma di dalam kerak bumi. Apakah contoh utama batuan ini?",
+                options: ["Basalt", "Pumis", "Granit", "Obsidian"],
+                answer: 2,
+                hero: "⚡ Thor",
+                explain: "Granit dan Gabro merupakan contoh batuan Igneus Rejahan yang membeku secara perlahan di bawah permukaan bumi."
+            },
+            {
+                q: "3. Manakah antara berikut merupakan ciri utama Batuan Igneus TEROBOSAN?",
+                options: ["Mempunyai saiz kristal yang kasar", "Terbentuk daripada lava di permukaan bumi yang membeku secara pantas", "Terbentuk daripada himpunan fosil marin", "Sangat lembut dan berserat"],
+                answer: 1,
+                hero: "⚡ Thor",
+                explain: "Igneus Terobosan terhasil daripada lava yang meletus ke permukaan bumi dan sejuk dengan cepat."
+            },
+            {
+                q: "4. Batuan SEDIMEN terbentuk melalui proses:",
+                options: ["Penjepulan magma di bawah tanah", "Pemendapan, mampatan, dan penyemenan serpihan bahan", "Haba dan tekanan yang tinggi", "Pembekuan ais glasier"],
+                answer: 1,
+                hero: "🛡️ Captain America",
+                explain: "Sedimen terhasil daripada serpihan batuan dan fosil yang mendap dan dimampatkan bertapis-tapis."
+            },
+            {
+                q: "5. Manakah antara berikut merupakan contoh Batuan Metamorfosis yang bertukar bentuk daripada Batu Kapur?",
+                options: ["Guli (Marble)", "Kuartzit", "Gneis", "Slat"],
+                answer: 0,
+                hero: "🟢 Hulk",
+                explain: "Batu kapur (sedimen) bertukar menjadi Guli (metamorfosis) akibat tekanan dan suhu yang amat tinggi!"
+            },
+            {
+                q: "6. Batu Kapur sangat penting dalam sektor pembangunan dan pembinaan sebagai bahan mentah utama untuk:",
+                options: ["Pembuatan besi keluli", "Pemprosesan simen dan konkrit", "Batu permata perhiasan", "Kaca tingkap"],
+                answer: 1,
+                hero: "🦾 Iron Man",
+                explain: "Batu kapur diproses dan dibakar untuk menghasilkan simen yang menjadi asas binaan."
+            },
+            {
+                q: "7. Batuan Sedimen jenis Syal / Tanah Liat kerap digunakan oleh manusia untuk membuat:",
+                options: ["Landasan kereta api", "Batu bata, tembikar, dan genting bumbung", "Mata pemotong kaca", "Baja fosfat"],
+                answer: 1,
+                hero: "🕷️ Spiderman",
+                explain: "Syal / Tanah Liat mempunyai tekstur halus yang sesuai dibentuk menjadi batu bata dan tembikar."
+            },
+            {
+                q: "8. Apakah batuan igneus terobosan yang berliang dan ringan sehingga mampu terapung di atas air?",
+                options: ["Gabro", "Pumis", "Diorit", "Syal"],
+                answer: 1,
+                hero: "⚡ Thor",
+                explain: "Pumis mengandungi byk liang udara terperangkap semasa pembekuan lava meletus secara drastik."
+            },
+            {
+                q: "9. Batu Arang tergolong dalam kategori Batuan Sedimen Organik. Apakah kegunaan utamanya?",
+                options: ["Bahan pembuat barang kemas", "Bahan api penjanaan kuasa elektrik", "Kemasan dinding premis", "Baja pertanian"],
+                answer: 1,
+                hero: "🦾 Iron Man",
+                explain: "Batu arang dibakar sebagai sumber bahan api fosil di stesen penjanaan kuasa elektrik."
+            },
+            {
+                q: "10. Apakah perubahan metamorfosis bagi batuan Granit apabila dikenakan haba dan tekanan melampau?",
+                options: ["Bertukar menjadi Gneis", "Bertukar menjadi Kuartzit", "Bertukar menjadi Guli", "Bertukar menjadi Batu Pasir"],
+                answer: 0,
+                hero: "🟢 Hulk",
+                explain: "Batuan Igneus Rejahan Granit bertukar menjadi Batuan Metamorfosis Gneis apabila mengalami haba dan tekanan tinggi."
+            }
+        ];
+
+        let currentQIdx = 0;
+        let quizScore = 0;
+        let answered = false;
+
+        function renderQuestion() {
+            answered = false;
+            const q = quizQuestions[currentQIdx];
+            
+            const pct = ((currentQIdx) / quizQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('currentQNum').innerText = currentQIdx + 1;
+
+            document.getElementById('questionText').innerHTML = `<span class="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-md mr-2 border border-black">${q.hero}</span> ${q.q}`;
+
+            const optContainer = document.getElementById('optionsContainer');
+            optContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full text-left p-4 rounded-xl border-2 border-black font-semibold bg-white hover:bg-yellow-100 transition comic-btn flex items-center justify-between text-sm md:text-base`;
+                btn.innerHTML = `<span><strong>${String.fromCharCode(65 + idx)}.</strong> ${opt}</span> <i class="far fa-circle text-gray-400"></i>`;
+                btn.onclick = () => selectAnswer(idx);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('nextQBtn').classList.add('hidden');
+        }
+
+        function selectAnswer(selectedIdx) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizQuestions[currentQIdx];
+            const optBtns = document.querySelectorAll('.option-btn');
+            const feedbackEl = document.getElementById('quizFeedback');
+
+            if (selectedIdx === q.answer) {
+                playSound('correct');
+                quizScore += 10;
+                addScore(10);
+                document.getElementById('quizScoreText').innerText = quizScore;
+
+                optBtns[selectedIdx].className = "w-full text-left p-4 rounded-xl border-2 border-green-700 bg-green-200 font-bold text-green-900 flex items-center justify-between text-sm md:text-base";
+                optBtns[selectedIdx].querySelector('i').className = "fas fa-check-circle text-green-700 text-xl";
+
+                feedbackEl.className = "p-4 rounded-xl border-2 border-green-700 bg-green-100 text-green-900 font-bold block";
+                feedbackEl.innerHTML = `🎉 TEPAT SEKALI! ${q.explain} [+10 Mata]`;
+
+            } else {
+                playSound('wrong');
+                optBtns[selectedIdx].className = "w-full text-left p-4 rounded-xl border-2 border-red-700 bg-red-200 font-bold text-red-900 flex items-center justify-between text-sm md:text-base";
+                optBtns[selectedIdx].querySelector('i').className = "fas fa-times-circle text-red-700 text-xl";
+
+                optBtns[q.answer].className = "w-full text-left p-4 rounded-xl border-2 border-green-700 bg-green-100 font-bold text-green-900 flex items-center justify-between text-sm md:text-base";
+
+                feedbackEl.className = "p-4 rounded-xl border-2 border-red-700 bg-red-100 text-red-900 font-bold block";
+                feedbackEl.innerHTML = `❌ KURANG TEPAT! Jawapan betul ialah <strong>${q.options[q.answer]}</strong>.<br><span class="text-sm font-normal text-gray-800">${q.explain}</span>`;
+            }
+
+            document.getElementById('nextQBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentQIdx++;
+            if (currentQIdx < quizQuestions.length) {
+                renderQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            playSound('win');
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('questionContainer').classList.add('hidden');
+            document.getElementById('optionsContainer').classList.add('hidden');
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('nextQBtn').classList.add('hidden');
+
+            const resultScreen = document.getElementById('quizResultScreen');
+            resultScreen.classList.remove('hidden');
+
+            document.getElementById('finalQuizScore').innerText = `${quizScore} / 100`;
+
+            const badgeEl = document.getElementById('resultBadge');
+            if (quizScore >= 80) {
+                badgeEl.innerText = "🥇 PANGKAT: HERO BATUAN AGUNG (EXCELLENT!)";
+                badgeEl.className = "mt-3 inline-block bg-yellow-400 text-black border-2 border-black font-comic px-4 py-1.5 rounded-full text-lg font-bold";
+            } else if (quizScore >= 50) {
+                badgeEl.innerText = "🥈 PANGKAT: PEJUANG GEOGRAFI (GOOD JOB!)";
+                badgeEl.className = "mt-3 inline-block bg-blue-400 text-white border-2 border-black font-comic px-4 py-1.5 rounded-full text-lg font-bold";
+            } else {
+                badgeEl.innerText = "🥉 PANGKAT: PELAJAR MASA DEPAN (KEEP TRYING!)";
+                badgeEl.className = "mt-3 inline-block bg-gray-300 text-black border-2 border-black font-comic px-4 py-1.5 rounded-full text-lg font-bold";
+            }
+        }
+
+        function restartQuiz() {
+            playSound('click');
+            currentQIdx = 0;
+            quizScore = 0;
+            document.getElementById('quizScoreText').innerText = 0;
+
+            document.getElementById('questionContainer').classList.remove('hidden');
+            document.getElementById('optionsContainer').classList.remove('hidden');
+            document.getElementById('quizResultScreen').classList.add('hidden');
+
+            renderQuestion();
+        }
+
+        function goToCert() {
+            switchTab('certTab');
+        }
+
+        function generateCertificate() {
+            playSound('click');
+            const nameInput = document.getElementById('studentNameInput').value.trim();
+            if (nameInput === '') {
+                alert('Sila masukkan nama anda terlebih dahulu!');
+                return;
+            }
+            document.getElementById('certNameDisplay').innerText = nameInput.toUpperCase();
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // Window Onload Initialization
+        window.onload = function() {
+            initMatchGame();
+            renderQuestion();
+        };
+    </script>
+</body>
+</html>
